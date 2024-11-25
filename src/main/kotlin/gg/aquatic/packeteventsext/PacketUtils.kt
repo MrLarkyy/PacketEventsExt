@@ -16,13 +16,8 @@ object PacketUtils {
     private val UNPOOLED_ALLOC: ByteBufAllocator = UnpooledByteBufAllocator(true, true)
     //private val ALLOC: ByteBufAllocator = UnpooledByteBufAllocator(true, true)
 
-    fun constBuffer(immortal: Boolean, constBuffer: ByteBuf): ByteBuf {
-        //return Unpooled.unreleasableBuffer(constBuffer.asReadOnly())
-        return if (immortal) {
-            Unpooled.unreleasableBuffer(constBuffer.asReadOnly())
-        } else {
-            constBuffer
-        }
+    fun constBuffer(constBuffer: ByteBuf): ByteBuf {
+        return Unpooled.unreleasableBuffer(constBuffer.asReadOnly())
     }
 
     /*
@@ -71,7 +66,7 @@ object PacketUtils {
 }
 
 fun PacketWrapper<*>.constBuffer(immortal: Boolean): ByteBuf {
-    return PacketUtils.constBuffer(immortal, createBuffer(immortal))
+    return PacketUtils.constBuffer(createBuffer(immortal))
 }
 
 fun PacketWrapper<*>.createBuffer(immortal: Boolean): ByteBuf {
