@@ -1,9 +1,11 @@
 plugins {
     kotlin("jvm") version "2.0.21"
+    id("co.uzzu.dotenv.gradle") version "2.0.0"
+    `maven-publish`
 }
 
 group = "gg.aquatic.packeteventsext"
-version = "1.0"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -22,4 +24,47 @@ dependencies {
 
 kotlin {
     jvmToolchain(17)
+}
+
+val maven_username = if (env.isPresent("MAVEN_USERNAME")) env.fetch("MAVEN_USERNAME") else ""
+val maven_password = if (env.isPresent("MAVEN_PASSWORD")) env.fetch("MAVEN_PASSWORD") else ""
+
+tasks {
+    compileJava {
+        options.encoding = Charsets.UTF_8.name()
+        options.release.set(17)
+    }
+
+    javadoc {
+        options.encoding = Charsets.UTF_8.name()
+    }
+
+    processResources {
+        filteringCharset = Charsets.UTF_8.name()
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "aquaticRepository"
+            url = uri("https://repo.nekroplex.com/releases")
+
+            credentials {
+                username = maven_username
+                password = maven_password
+            }
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+    }
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "gg.aquatic.packeteventsext"
+            artifactId = "PacketEventsExt"
+            version = "${project.version}"
+            from(components["java"])
+        }
+    }
 }

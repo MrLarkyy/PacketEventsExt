@@ -3,10 +3,7 @@ package gg.aquatic.packeteventsext
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.wrapper.PacketWrapper
 import gg.aquatic.packeteventsext.PacketUtils.dynamic
-import io.netty.buffer.ByteBuf
-import io.netty.buffer.ByteBufAllocator
-import io.netty.buffer.Unpooled
-import io.netty.buffer.UnpooledByteBufAllocator
+import io.netty.buffer.*
 import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
@@ -15,21 +12,41 @@ import org.bukkit.entity.Player
 
 object PacketUtils {
 
-    private val ALLOC: ByteBufAllocator = UnpooledByteBufAllocator(true, true)
+    private val POOLED_ALLOC: ByteBufAllocator = PooledByteBufAllocator(true)
+    private val UNPOOLED_ALLOC: ByteBufAllocator = UnpooledByteBufAllocator(true, true)
+    //private val ALLOC: ByteBufAllocator = UnpooledByteBufAllocator(true, true)
 
-    fun constBuffer(constBuffer: ByteBuf): ByteBuf {
-        return Unpooled.unreleasableBuffer(constBuffer.asReadOnly())
+    fun constBuffer(immortal: Boolean, constBuffer: ByteBuf): ByteBuf {
+        //return Unpooled.unreleasableBuffer(constBuffer.asReadOnly())
+        return if (immortal) {
+            Unpooled.unreleasableBuffer(constBuffer.asReadOnly())
+        } else {
+            constBuffer
+        }
     }
 
+    /*
     fun buffer(): ByteBuf {
         return directBuffer()
     }
+
     fun directBuffer(): ByteBuf {
         return ALLOC.directBuffer()
     }
+     */
+
+    fun unpooledBuffer(): ByteBuf {
+        return UNPOOLED_ALLOC.directBuffer()
+    }
+    fun pooledBuffer(): ByteBuf {
+        return POOLED_ALLOC.directBuffer()
+    }
+
+    /*
     fun directBuffer(capacity: Int): ByteBuf {
         return ALLOC.directBuffer(capacity)
     }
+     */
 
     fun writeConst(context: ChannelHandlerContext, constByteBuf: ByteBuf) {
         context.write(prepareConstToSend(constByteBuf))
@@ -43,6 +60,7 @@ object PacketUtils {
     fun writeAndFlushConst(context: ChannelHandlerContext, constByteBuf: ByteBuf): ChannelFuture? {
         return context.writeAndFlush(prepareConstToSend(constByteBuf))
     }
+
     private fun prepareConstToSend(byteBuf: ByteBuf): ByteBuf {
         return byteBuf.duplicate()
     }
@@ -52,17 +70,18 @@ object PacketUtils {
     }
 }
 
-fun PacketWrapper<*>.constBuffer(direct: Boolean = true): ByteBuf {
-    return PacketUtils.constBuffer(createBuffer(direct))
+fun PacketWrapper<*>.constBuffer(immortal: Boolean): ByteBuf {
+    return PacketUtils.constBuffer(immortal, createBuffer(immortal))
 }
 
-fun PacketWrapper<*>.createBuffer(direct: Boolean = true): ByteBuf {
-    return createBuffer0(if (direct) PacketUtils.directBuffer() else PacketUtils.buffer())
+fun PacketWrapper<*>.createBuffer(immortal: Boolean): ByteBuf {
+    return createBuffer0(if (immortal) PacketUtils.unpooledBuffer() else PacketUtils.pooledBuffer())
 }
-
-fun Collection<PacketWrapper<*>>.constBuffers(direct: Boolean = true): Collection<ByteBuf> {
-    return this.map { it.constBuffer(direct) }
+/*
+fun Collection<PacketWrapper<*>>.constBuffers(immortal: Boolean = false): Collection<ByteBuf> {
+    return this.map { it.constBuffer(immortal) }
 }
+ */
 
 fun PacketWrapper<*>.writeAndFlushDynamic(context: ChannelHandlerContext) {
     context.writeAndFlush(dynamic(this, context))
@@ -97,6 +116,7 @@ fun Collection<PacketWrapper<*>>.sendOptimized(vararg players: Player) {
         const.tryRelease()
     }
 }
+
 fun Set<PacketWrapper<*>>.sendOptimized(vararg players: Player) = this.toList().sendOptimized(*players)
 fun Array<PacketWrapper<*>>.sendOptimized(vararg players: Player) = this.toList().sendOptimized(*players)
 

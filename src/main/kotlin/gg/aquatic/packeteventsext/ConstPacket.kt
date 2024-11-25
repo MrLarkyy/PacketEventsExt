@@ -20,9 +20,11 @@ class ConstPacket(val buffer: ByteBuf, val immortal: Boolean = false) {
     constructor(wrapper: PacketWrapper<*>, immortal: Boolean) : this(wrapper.constBuffer(immortal))
 
     companion object {
+        /*
         private fun createByteBufs(vararg wrappers: PacketWrapper<*>): Array<ByteBuf> {
-            return wrappers.map { it.constBuffer() }.toTypedArray()
+            return wrappers.map { it.constBuffer(immortal = ) }.toTypedArray()
         }
+         */
     }
 
     internal fun write(player: PacketUser) {
