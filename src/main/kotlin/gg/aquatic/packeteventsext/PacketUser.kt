@@ -7,7 +7,6 @@ import io.netty.buffer.ByteBuf
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import org.bukkit.entity.Player
-import java.util.function.Consumer
 
 
 class PacketUser(
@@ -21,18 +20,19 @@ class PacketUser(
             return silentContext.channel()
         }
 
-    fun writeAndOccasionallyFlushSilently(buffers: Array<ByteBuf>) {
+    /*
+    internal fun writeAndOccasionallyFlushSilently(buffers: Array<ByteBuf>) {
         this.writeAndFlushWithThresholdSilently(buffers, 100)
     }
 
-    fun writeAndFlushWithThresholdSilently(buffers: Array<ByteBuf>, threshold: Int) {
+    internal fun writeAndFlushWithThresholdSilently(buffers: Array<ByteBuf>, threshold: Int) {
         this.writeAndFlushWithThresholdSilently(
             buffers,
             threshold
         ) { buffer: ByteBuf -> this.writeSilently(buffer) }
     }
 
-    fun writeAndFlushWithThresholdSilently(
+    internal fun writeAndFlushWithThresholdSilently(
         buffers: Array<ByteBuf>,
         threshold: Int,
         writeFunction: Consumer<ByteBuf>
@@ -45,38 +45,39 @@ class PacketUser(
         if (buffers.size % threshold != 0)  //last loop was not a flush
             this.flush()
     }
+     */
 
-    fun writeDynamicSilently(packet: PacketWrapper<*>) {
+    internal fun writeDynamicSilently(packet: PacketWrapper<*>) {
         packet.writeDynamic(this.silentContext)
     }
 
-    fun writeAndFlushDynamicSilently(packet: PacketWrapper<*>) {
+    internal fun writeAndFlushDynamicSilently(packet: PacketWrapper<*>) {
         packet.writeAndFlushDynamic(this.silentContext)
     }
 
-    fun writeSilently(buffer: ByteBuf) {
+    private fun writeSilently(buffer: ByteBuf) {
         this.silentContext.write(buffer)
     }
 
-    fun writeAndFlushSilently(buffer: ByteBuf) {
+    internal fun writeAndFlushSilently(buffer: ByteBuf) {
         this.silentContext.writeAndFlush(buffer)
     }
 
-    fun flush() {
+    internal fun flush() {
         //this.silentContext().flush();
         this.channel.flush()
     }
 
-    fun writeAllConstAndThenFlushSilently(bufs: Array<ByteBuf>) {
+    internal fun writeAllConstAndThenFlushSilently(bufs: Array<ByteBuf>) {
         for (buf in bufs) this.writeConstSilently(buf)
         this.flush()
     }
 
-    fun writeConstSilently(buf: ByteBuf) {
+    internal fun writeConstSilently(buf: ByteBuf) {
         PacketUtils.writeConst(this.silentContext, buf)
     }
 
-    fun writeAndFlushConstSilently(buf: ByteBuf) {
+    internal fun writeAndFlushConstSilently(buf: ByteBuf) {
         PacketUtils.writeAndFlushConst(this.silentContext, buf)
     }
 }
