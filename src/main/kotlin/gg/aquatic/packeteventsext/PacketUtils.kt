@@ -116,8 +116,6 @@ fun Collection<PacketWrapper<*>>.sendOptimized(vararg players: Player) {
         const.tryRelease()
     }
 }
-
-fun Set<PacketWrapper<*>>.sendOptimized(vararg players: Player) = this.toList().sendOptimized(*players)
 fun Array<PacketWrapper<*>>.sendOptimized(vararg players: Player) = this.toList().sendOptimized(*players)
 
 @Suppress("UnstableApiUsage")
