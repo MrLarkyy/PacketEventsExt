@@ -125,8 +125,7 @@ private fun PacketWrapper<*>.createBuffer0(emptyByteBuf: ByteBuf): ByteBuf {
     val packetId: Int = packetTypeData.nativePacketId
     if (packetId < 0) throw Exception(
         ("Failed to create packet " + this::class.java.getSimpleName() + " in server version "
-                + PacketEvents.getAPI().serverManager.version + "! Contact the developer and show him this error! " +
-                "Otherwise Alix will not work as intended!")
+                + PacketEvents.getAPI().serverManager.version + "! Contact the developer and show him this error!")
     )
 
     buffer = emptyByteBuf
