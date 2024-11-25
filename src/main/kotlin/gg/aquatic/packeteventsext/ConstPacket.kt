@@ -14,6 +14,7 @@ import io.netty.buffer.ByteBuf
  */
 class ConstPacket(val buffer: ByteBuf, val immortal: Boolean = false) {
 
+    @Volatile
     var released = false
         internal set
 
@@ -42,8 +43,7 @@ class ConstPacket(val buffer: ByteBuf, val immortal: Boolean = false) {
     fun writeAndFlush(player: PacketUser) {
         if (released) return
         player.channel.eventLoop().execute {
-            write(player)
-            player.flush()
+            player.writeAndFlushConstSilently(buffer)
             if (!immortal) {
                 released = true
                 buffer.unwrap().release()
