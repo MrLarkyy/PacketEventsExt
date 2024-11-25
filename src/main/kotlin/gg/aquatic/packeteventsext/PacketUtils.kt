@@ -94,8 +94,7 @@ fun Collection<PacketWrapper<*>>.sendOptimized(vararg players: Player) {
         }
     }
     for (const in consts) {
-        const.buffer.unwrap().release()
-        const.released = true
+        const.tryRelease()
     }
 }
 fun Set<PacketWrapper<*>>.sendOptimized(vararg players: Player) = this.toList().sendOptimized(*players)

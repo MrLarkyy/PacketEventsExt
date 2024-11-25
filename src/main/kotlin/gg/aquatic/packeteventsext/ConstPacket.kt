@@ -48,6 +48,13 @@ class ConstPacket(val buffer: ByteBuf, val immortal: Boolean = false) {
             }
         }
     }
+
+    fun tryRelease() {
+        if (released) return
+        if (immortal) return
+        released = true
+        buffer.unwrap().release()
+    }
 }
 
 fun Collection<PacketWrapper<*>>.constPackets(immortal: Boolean = false): Collection<ConstPacket> {
