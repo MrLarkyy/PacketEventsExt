@@ -53,8 +53,21 @@ fun sendStaticPackets(packetPlayer: PacketPlayer) {
 
 ```
 
+# Import
 
-
+Kotlin DSL
+```kotlin
+repositories {
+    maven {
+        url = uri("https://repo.nekroplex.com/releases")
+    }
+}
+```
+```kotlin
+dependencies {
+    implementation("gg.aquatic.packeteventsext:PacketEventsExt:1.0.0")
+}
+```
 
 
 
