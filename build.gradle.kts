@@ -18,7 +18,7 @@ repositories {
 dependencies {
     compileOnly("com.github.retrooper:packetevents-spigot:2.6.0")
     compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
-    compileOnly("io.netty:netty-all:4.1.115.Final")
+    compileOnly("io.netty:netty-all:4.2.10.Final")
 }
 
 kotlin {
